@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>News Feed</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>News Feed</h1>
+  <button onclick="window.location.href='profile.html'">View Profile</button>
+  <button id="logout">Logout</button>
+  <input type="text" id="search" placeholder="Search news..." />
+  <button onclick="filterNews()">Search</button>
+  <div id="news-container"></div>
+
+  <script>
+    const newsContainer = document.getElementById('news-container');
+    const logoutBtn = document.getElementById('logout');
+    const searchInput = document.getElementById('search');
+    const token = localStorage.getItem('token');
+    let allNews = [];
+
+    if (!token) window.location.href = 'login.html';
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    });
+
+    async function fetchNews() {
+      try {
+        const response = await fetch('http://localhost:5000/api/news', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        allNews = await response.json();
+        displayNews(allNews);
+      } catch {
+        newsContainer.innerHTML = '<p>Error loading news.</p>';
+      }
+    }
+
